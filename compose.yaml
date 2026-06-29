@@ -3,7 +3,8 @@ services:
     # Image is built & pushed to GHCR by .github/workflows/docker-publish.yml.
     # Set STREAMINGHUB_IMAGE in your ROOT .env, e.g.
     #   STREAMINGHUB_IMAGE=ghcr.io/<owner>/<repo>:latest
-    image: ${STREAMINGHUB_IMAGE?}
+    # image: ${STREAMINGHUB_IMAGE?}
+    image: ghcr.io/lystad93/norway-streaming-hub:latest
     container_name: streaminghub
     restart: unless-stopped
     expose:
