@@ -1,0 +1,33 @@
+services:
+  streaminghub:
+    # Image is built & pushed to GHCR by .github/workflows/docker-publish.yml.
+    # Set STREAMINGHUB_IMAGE in your ROOT .env, e.g.
+    #   STREAMINGHUB_IMAGE=ghcr.io/<owner>/<repo>:latest
+    image: ${STREAMINGHUB_IMAGE?}
+    container_name: streaminghub
+    restart: unless-stopped
+    volumes:
+      # Reserved for an optional on-disk cache (app currently caches in memory).
+      - ${DOCKER_DATA_DIR}/streaminghub:/app/data
+    expose:
+      - 7000
+    env_file:
+      - .env # app-level secrets only (TMDB key). See .env.example.
+    environment:
+      - PORT=7000
+      - CACHE_DIR=/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.streaminghub.rule=Host(`${STREAMINGHUB_HOSTNAME?}`)"
+      - "traefik.http.routers.streaminghub.entrypoints=websecure"
+      - "traefik.http.routers.streaminghub.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.streaminghub.middlewares=authelia@docker"
+      - "traefik.http.services.streaminghub.loadbalancer.server.port=7000"
+    # networks:
+    #   - ${DOCKER_NETWORK:-aio_default}
+    profiles:
+      - streaminghub
+      - all
+# networks:
+#   ${DOCKER_NETWORK:-aio_default}:
+#     external: true
