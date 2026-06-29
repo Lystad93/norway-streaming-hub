@@ -138,11 +138,17 @@ use in AIOStreams:      http://streaminghub:7000/<config-blob>/manifest.json
 
 This is the same split that works for your PostersPlus setup.
 
-### The data volume
+### Where config and state live (nowhere on the server)
 
-`${DOCKER_DATA_DIR}/streaminghub` is mounted at `/app/data` (with `CACHE_DIR`
-pointing to it) and reserved for a future on-disk cache. The addon currently
-caches in memory only, so the folder stays empty for now — harmless to keep.
+The addon is **stateless** — no database, no data volume. Your choices (country,
+providers, subscription/rent/buy) are encoded into the install URL's
+`<config-blob>` segment; Stremio/AIOStreams hold that URL, and the server reads
+the choices from each request. The only caches (Cinemeta lookups, etc.) sit in
+memory and repopulate after a restart. So there's no volume to mount and nothing
+to back up.
+
+`PORT=7000` in `environment` is the single value that must match the Traefik
+`loadbalancer.server.port=7000` label.
 
 Open the `/configure` page, choose your services and offer types, and click
 **Install** — Stremio opens with your personal configured install URL.
